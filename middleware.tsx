@@ -1,9 +1,17 @@
 import { NextResponse, NextRequest } from 'next/server';
 
+interface User {
+  first_name: string;
+  last_name: string;
+  username: string;
+  email: string;
+  role: string;
+}
+
 export function middleware(request: NextRequest) {
   // Get the user cookie
   const userCookie = request.cookies.get('user');
-  const user = userCookie ? JSON.parse(userCookie.value) : null;
+  const user: User = userCookie ? JSON.parse(userCookie.value) : null;
 
   if (request.nextUrl.pathname === '/') {
     return NextResponse.redirect(new URL('/login', request.url));

@@ -2,6 +2,7 @@
 import { authenticatedRequest } from '@/utils/api';
 import { useState, useEffect, FormEvent } from 'react';
 import { useUser } from "../../../_layout/userContext";
+import { getFirstLetterCapitalized } from '@/utils/utils';
 
 export default function UpdateInfo() {
     const { user } = useUser();

@@ -23,7 +23,7 @@ export const Sidebar = ({user}: {user: any}) => {
                 </ul>
                 <ul className="pt-4 mt-4 space-y-2 font-medium border-t border-gray-200">
                     <li>
-                        <a href="#" className="flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100 group">
+                        <a href="https://textmining2.bsc.es/rocket/airflow" className="flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100 group">
                         <svg viewBox="0 0 128 128" className="text-gray-500 w-6 h-6" xmlns="http://www.w3.org/2000/svg">
                             <path d="m2.5441 127 60.809-62.332a1.124 1.124 0 0 0 0.1359-1.4368c-3.6977-5.1625-10.521-6.0578-13.05-9.5268-7.4903-10.275-9.3909-16.092-12.61-15.731a0.98374 0.98374 0 0 0-0.58464 0.3085l-21.966 22.518c-12.638 12.944-14.454 41.475-14.782 65.367a1.1908 1.1908 0 0 0 2.0473 0.83273z" fill="#017cee"/>
                             <path d="m126.99 125.46-62.332-60.813a1.124 1.124 0 0 0-1.4389-0.1359c-5.1625 3.6998-6.0578 10.521-9.5268 13.05-10.275 7.4903-16.092 9.3909-15.731 12.61a0.98374 0.98374 0 0 0 0.3085 0.58248l22.518 21.966c12.944 12.638 41.475 14.454 65.367 14.782a1.1908 1.1908 0 0 0 0.83489-2.0408z" fill="#00ad46"/>

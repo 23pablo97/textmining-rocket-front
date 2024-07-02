@@ -11,7 +11,15 @@ interface User {
 export function middleware(request: NextRequest) {
   // Get the user cookie
   const userCookie = request.cookies.get('user');
-  const user: User = userCookie ? JSON.parse(userCookie.value) : null;
+
+  let user: User|null = null;
+  if (userCookie) {
+    try {
+      user = JSON.parse(userCookie.value);
+    } catch (e) {
+      console.error('Failed to parse user cookie:', e);
+    }
+  }
 
   if (request.nextUrl.pathname === '/') {
     return NextResponse.redirect(new URL('/login', request.url));

@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, ChangeEvent, FormEvent } from 'react';
+import React, { useState, useRef, ChangeEvent, FormEvent } from 'react';
 import { authenticatedRequest } from '@/utils/api';
 import { capitalizeFirstLetter } from '@/utils/utils';
 import { useUser } from '../../_layout/userContext';
@@ -9,7 +9,7 @@ interface UploadResourceFormProps {
 }
 
 const UploadResourceForm: React.FC<UploadResourceFormProps> = ({ fetchData }) => {
-    const resourceTypes = ['corpus', 'ontology', 'otro'];
+    const resourceTypes = ['corpus', 'ontology', 'other'];
     const needLanguage = ['corpus', 'ontology'];
     const languages = ['catalan', 'english', 'spanish'];
 
@@ -22,7 +22,10 @@ const UploadResourceForm: React.FC<UploadResourceFormProps> = ({ fetchData }) =>
     const [message, setMessage] = useState('');
     const [isUpload, setIsUpload] = useState(true);
     const [isSuccess, setIsSuccess] = useState(false);
+    const [filenameCheck, setFilenameCheck] = useState('');
+    const [isNameDuplicated, setIsNameDuplicated] = useState(false);
     const { user } = useUser();
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     const setInitialData = () => {
         setFile(null);
@@ -32,14 +35,29 @@ const UploadResourceForm: React.FC<UploadResourceFormProps> = ({ fetchData }) =>
         setType('corpus');
         setResourceLanguage('catalan');
         setMessage('');
-        setIsUpload(true);
         setIsSuccess(false);
+        setFilenameCheck('');
+        setIsNameDuplicated(false);
+        if (fileInputRef.current) {
+            fileInputRef.current.value = '';
+        }
     }
 
     const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
         if (event.target.files && event.target.files[0]) {
             setFile(event.target.files[0]);
             setFilename(event.target.files[0].name);
+        }
+    };
+
+    const handleChangeName = async (event: ChangeEvent<HTMLInputElement>) => {
+        setResourceName(event.target.value);
+        if (event.target.value !== '') {
+            const response = await authenticatedRequest('get', `/file_storage/check_filename?resource_name=${event.target.value}`);
+            setFilenameCheck(response.data.message);
+            setIsNameDuplicated(response.data.is_duplicated);
+        } else {
+            setFilenameCheck('');
         }
     };
 
@@ -65,6 +83,7 @@ const UploadResourceForm: React.FC<UploadResourceFormProps> = ({ fetchData }) =>
         setIsSuccess(false);
         if (!file) {
             setMessage('Please select a file.');
+            setIsUpload(true);
             return;
         }
 
@@ -86,11 +105,15 @@ const UploadResourceForm: React.FC<UploadResourceFormProps> = ({ fetchData }) =>
                     resource_type: resourceType,
                     created_by: user.username,
                 });
-                setMessage(response.data.message);
-                fetchData();
+                if (response.status === 200){
+                    fetchData();
+                    hideModal();
+                    setIsSuccess(true);
+                } else {
+                    console.log(response.data.error);
+                    setMessage(response.data.error);
+                }
                 setIsUpload(true);
-                hideModal();
-                setIsSuccess(true);
             };
         } catch (error) {
             setMessage('Failed to upload file.');
@@ -136,6 +159,19 @@ const UploadResourceForm: React.FC<UploadResourceFormProps> = ({ fetchData }) =>
                         </div>
                         <div className="p-4 md:p-5 space-y-2">
                             {/* Form */}
+                            <div className="flex p-4 mb-4 text-sm text-blue-800 rounded-lg bg-blue-50 dark:bg-gray-800 dark:text-blue-400" role="alert">
+                                <svg className="flex-shrink-0 inline w-4 h-4 me-3 mt-[2px]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
+                                </svg>
+                                <span className="sr-only">Info</span>
+                                <div>
+                                    <span className="font-medium">Data quality matters to us! Follow these tips</span>
+                                    <ul className="mt-1.5 list-disc list-inside">
+                                        <li>Use a clear resource name.</li>
+                                        <li>In the description be as comprehensive as possible with what the resource contains, this helps us to understand what we have.</li>
+                                    </ul>
+                                </div>
+                            </div>
                             <form>
                                 <div className="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
                                     <div className="sm:col-span-3">
@@ -174,8 +210,21 @@ const UploadResourceForm: React.FC<UploadResourceFormProps> = ({ fetchData }) =>
                                         <div className="sm:col-span-3">
                                             <label htmlFor="name" className="block text-sm font-medium leading-6 text-gray-900">Resource Name</label>
                                             <div className="mt-2">
-                                                <input onChange={e => setResourceName(e.target.value)} value={resourceName} type="text" id="name" className="mb-5 shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" />
+                                                <input onChange={handleChangeName} value={resourceName} type="text" id="name" className="mb-1 shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" />
                                             </div>
+                                            {filenameCheck !== '' ?
+                                            (<div className="flex items-center text-xs text-green-800" role="alert">
+                                                <svg className="flex-shrink-0 inline w-3 h-3 me-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
+                                                </svg>
+                                                <span className="sr-only">Info</span>
+                                                <div>
+                                                    <span className="font-medium">{filenameCheck}</span>
+                                                </div>
+                                            </div>)
+                                            :
+                                            <></>
+                                        }
                                         </div>
                                     }
                                 </div>
@@ -184,19 +233,67 @@ const UploadResourceForm: React.FC<UploadResourceFormProps> = ({ fetchData }) =>
                                     <div className="sm:col-span-3 mb-5">
                                         <label htmlFor="name" className="block text-sm font-medium leading-6 text-gray-900">Resource Name</label>
                                         <div className="mt-2">
-                                            <input onChange={e => setResourceName(e.target.value)} value={resourceName} type="text" id="name" className="mb-5 shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" />
+                                            <input onChange={handleChangeName} value={resourceName} type="text" id="name" className="mb-1 shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" />
                                         </div>
+                                        {filenameCheck !== '' ?
+                                            (<div className="flex items-center text-xs text-green-800" role="alert">
+                                                <svg className="flex-shrink-0 inline w-3 h-3 me-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
+                                                </svg>
+                                                <span className="sr-only">Info</span>
+                                                <div>
+                                                    <span className="font-medium">{filenameCheck}</span>
+                                                </div>
+                                            </div>)
+                                            :
+                                            <></>
+                                        }
                                     </div>
                                 :
                                     <></>
                                 }
                 
-                                <label htmlFor="description" className="block mb-2 text-sm font-medium text-gray-900">Resource description</label>
+                                <label htmlFor="description" className="block mb-2 text-sm font-medium text-gray-900">Resource { !isNameDuplicated ? 'description': 'changelog' }</label>
                                 <textarea onChange={e => setDescription(e.target.value)} value={description} id="description" rows={4} className="block mb-5 p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500" placeholder="Add the resource description..."></textarea>
 
                                 <label className="block mb-2 text-sm font-medium text-gray-900" htmlFor="resource_file">File</label>
-                                <input onChange={handleFileChange} className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50" aria-describedby="resource_file_help" id="resource_file" type="file" />                            
+                                { resourceType === 'corpus' ? 
+                                    (<div className="p-4 mb-4 text-sm text-blue-800 rounded-lg bg-blue-50 dark:bg-gray-800 dark:text-blue-400" role="alert">
+                                        For corpus, please upload a zip file with a folder inside with the documents. The zip and folder have to have the same name. For example:<br/>
+                                        <pre className="p-2 rounded-md">
+                                            <code className="font-mono">
+                                                new_resource.zip<br />
+                                                &emsp;|_ new_resource<br />
+                                                &emsp;&emsp;|_ file_1.txt<br />
+                                                &emsp;&emsp;|_ file_2.txt<br />
+                                                &emsp;&emsp;|_ ...
+                                            </code>
+                                        </pre>
+                                    </div>)
+                                    :
+                                    <></>
+                                }
+                                <input 
+                                    onChange={handleFileChange}
+                                    className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50" 
+                                    id="resource_file"
+                                    type="file"
+                                    ref={fileInputRef}
+                                />                            
                             </form>
+                            { message !== "" ? 
+                                <div className="flex items-center p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400" role="alert">
+                                    <svg className="flex-shrink-0 inline w-4 h-4 me-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
+                                    </svg>
+                                    <span className="sr-only">Info</span>
+                                    <div>
+                                        {message}
+                                    </div>
+                                </div>
+                                :
+                                <></>
+                            }
                         </div>
                         <div className="flex items-center p-4 md:p-5 border-t border-gray-200 rounded-b">
                             {isUpload?

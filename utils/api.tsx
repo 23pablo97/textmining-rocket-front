@@ -83,7 +83,8 @@ export const authenticatedRequest = async (method: 'get' | 'post' | 'put' | 'del
                     throw new Error('Session expired, please log in again.');
                 }
             } else {
-                throw error;
+                console.log(error);
+                return error.response;
             }
         }
     } catch (error) {

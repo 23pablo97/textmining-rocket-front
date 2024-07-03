@@ -17,7 +17,7 @@ export const Sidebar = ({user}: {user: any}) => {
                             <path d="m10.933 19.231-7.668-4.13-1.37.739a.75.75 0 0 0 0 1.32l9.75 5.25c.221.12.489.12.71 0l9.75-5.25a.75.75 0 0 0 0-1.32l-1.37-.738-7.668 4.13a2.25 2.25 0 0 1-2.134-.001Z" />
                         </svg>
 
-                            <span className="ml-3">Services</span>
+                            <span className="ml-3">Services <span className="bg-gray-100 text-gray-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Soon</span></span>
                         </a>
                     </li>
                 </ul>

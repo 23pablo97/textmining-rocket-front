@@ -57,7 +57,7 @@ export const Navbar = ({user}: {user: any}) => {
                                         <a href="/auth/profile" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">Profile</a>
                                     </li>
                                     <li>
-                                        <a onClick={handleLogout} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">Sign out</a>
+                                        <a onClick={handleLogout} className="block button px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" role="menuitem">Sign out</a>
                                     </li>
                                 </ul>
                             </div>

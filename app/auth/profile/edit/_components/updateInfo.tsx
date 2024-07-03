@@ -2,7 +2,7 @@
 import { authenticatedRequest } from '@/utils/api';
 import { useState, useEffect, FormEvent } from 'react';
 import { useUser } from "../../../_layout/userContext";
-import { getFirstLetterCapitalized } from '@/utils/utils';
+import Cookies from "js-cookie";
 
 export default function UpdateInfo() {
     const { user } = useUser();
@@ -38,6 +38,8 @@ export default function UpdateInfo() {
             });
             setIsUpload(true);
             setIsSuccess(true);
+            const responseUser = await authenticatedRequest('get', `/users/${username}`)
+            Cookies.set('user', JSON.stringify(responseUser.data));
             setMessage(response.data.message || 'Information updated successfully.');
         } catch (error) {
             setMessage('Failed to upload file.');
@@ -51,16 +53,7 @@ export default function UpdateInfo() {
                 <h5 className="text-xl font-bold">General information</h5>
                 <form>
                     <div className="sm:col-span-3 mb-5">
-                        <label htmlFor="username" className="block mt-5 text-sm font-medium leading-6 text-gray-900">Username</label>
-                        <div className="mt-2">
-                            <input 
-                                onChange={e => setUsername(e.target.value)} 
-                                value={username} 
-                                type="text" 
-                                id="username" 
-                                className="mb-5 shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" 
-                            />
-                        </div>
+                        <label htmlFor="username" className="block mt-5 text-sm font-medium leading-6 text-gray-900">Username: {username}</label>
                     </div>
                     <div className="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
                         <div className="sm:col-span-3">
@@ -89,7 +82,7 @@ export default function UpdateInfo() {
                         </div>
                     </div>
                     <div className="sm:col-span-3 mb-5">
-                        <label htmlFor="email" className="block mt-5 text-sm font-medium leading-6 text-gray-900">Email</label>
+                        <label htmlFor="email" className="block mt-2 text-sm font-medium leading-6 text-gray-900">Email</label>
                         <div className="mt-2">
                             <input 
                                 onChange={e => setEmail(e.target.value)} 

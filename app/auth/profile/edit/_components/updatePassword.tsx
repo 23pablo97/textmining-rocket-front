@@ -1,16 +1,45 @@
 "use client";
+import { authenticatedRequest } from "@/utils/api";
 import PrelineScript from "@/utils/preline";
 import { useState, FormEvent } from 'react';
+import { useUser } from "../../../_layout/userContext";
 
 export default function UpdatePassword() {
+    const { user } = useUser();
     const [password, setPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmNewPassword, setConfirmNewPassword] = useState('');
     const [isUpload, setIsUpload] = useState(true);
+    const [isSuccess, setIsSuccess] = useState(true);
+    const [message, setMessage] = useState('');
+
 
     const handleUpdatePassword = async (e: FormEvent) => {
         e.preventDefault();
-        // Implement your password update logic here
+
+        setIsUpload(false);
+        setIsSuccess(false);
+
+        if (newPassword !== confirmNewPassword){
+            setIsUpload(true);
+            setIsSuccess(true);
+            setMessage("New Password doesn't match with validation password.");
+        }
+
+        // try {
+        //     const response = await authenticatedRequest('put', `/users/${username}`, {
+        //         password: password,
+        //         new_password: newPassword,
+        //     });
+        //     setIsUpload(true);
+        //     setIsSuccess(true);
+        //     const responseUser = await authenticatedRequest('get', `/users/${username}`)
+        //     Cookies.set('user', JSON.stringify(responseUser.data));
+        //     setMessage(response.data.message || 'Password updated successfully.');
+        // } catch (error) {
+        //     setMessage('Failed to upload file.');
+        //     console.error(error);
+        // }
     };
 
     return (
@@ -97,6 +126,7 @@ export default function UpdatePassword() {
                         Updating...
                     </button>
                 }
+                {message && <p className="mt-2 text-sm text-red-600">{message}</p>}
             </div>
         </div>
     );

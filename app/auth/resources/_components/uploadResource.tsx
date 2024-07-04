@@ -19,6 +19,7 @@ const UploadResourceForm: React.FC<UploadResourceFormProps> = ({ fetchData }) =>
     const [description, setDescription] = useState('');
     const [resourceType, setType] = useState(resourceTypes[0]);
     const [resourceLanguage, setResourceLanguage] = useState(languages[0]);
+    const [saveRemote, setSaveRemote] = useState(true);
     const [message, setMessage] = useState('');
     const [isUpload, setIsUpload] = useState(true);
     const [isSuccess, setIsSuccess] = useState(false);
@@ -38,6 +39,7 @@ const UploadResourceForm: React.FC<UploadResourceFormProps> = ({ fetchData }) =>
         setIsSuccess(false);
         setFilenameCheck('');
         setIsNameDuplicated(false);
+        setSaveRemote(true);
         if (fileInputRef.current) {
             fileInputRef.current.value = '';
         }
@@ -103,6 +105,7 @@ const UploadResourceForm: React.FC<UploadResourceFormProps> = ({ fetchData }) =>
                     resource_description: description,
                     resource_language: resourceLanguage,
                     resource_type: resourceType,
+                    save_remote: saveRemote,
                     created_by: user.username,
                 });
                 if (response.status === 200){
@@ -120,6 +123,11 @@ const UploadResourceForm: React.FC<UploadResourceFormProps> = ({ fetchData }) =>
             console.error(error);
         }
         setInitialData();
+    };
+
+    const handleCheckboxChange = (event: { target: { checked: boolean | ((prevState: boolean) => boolean); }; }) => {
+        console.log(event.target.checked);
+        setSaveRemote(event.target.checked);
     };
 
     return (
@@ -279,7 +287,17 @@ const UploadResourceForm: React.FC<UploadResourceFormProps> = ({ fetchData }) =>
                                     id="resource_file"
                                     type="file"
                                     ref={fileInputRef}
-                                />                            
+                                />
+                                <div className="flex mt-5 items-center">
+                                <input
+                                    id="link-checkbox"
+                                    type="checkbox"
+                                    checked={saveRemote}
+                                    onChange={handleCheckboxChange}
+                                    className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                                />
+                                <label className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Upload to Marenostrum.</label>
+                                </div>                           
                             </form>
                             { message !== "" ? 
                                 <div className="flex items-center p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400" role="alert">

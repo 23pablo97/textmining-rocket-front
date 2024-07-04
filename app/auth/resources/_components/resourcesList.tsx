@@ -5,19 +5,7 @@ import { useState, useEffect } from 'react';
 import Pagination from '@/app/_utils/Pagination';
 import { capitalizeFirstLetter, formatFileSize } from '@/utils/utils';
 import UploadResourceForm from './uploadResource';
-
-interface Document {
-    _id: string;
-    resource_name: string;
-    resource_description: string;
-    resource_type: string;
-    resource_language: string;
-    file_path: string;
-    version: string;
-    resource_size: number;
-    created_by: string;
-    created_at: string;
-}
+import { Document } from '@/app/_utils/types/Document';
 
 export default function ResourcesList() {
     const [documents, setDocuments] = useState<Document[]>([]);
@@ -62,9 +50,6 @@ export default function ResourcesList() {
                                         Resource Name
                                     </th>
                                     <th scope="col" className="px-6 py-3">
-                                        Description
-                                    </th>
-                                    <th scope="col" className="px-6 py-3">
                                         Type
                                     </th>
                                     <th scope="col" className="px-6 py-3">
@@ -97,9 +82,6 @@ export default function ResourcesList() {
                                             {document.resource_name}
                                         </th>
                                         <td className="px-6 py-4">
-                                            {document.resource_description}
-                                        </td>
-                                        <td className="px-6 py-4">
                                             {capitalizeFirstLetter(document.resource_type)}
                                         </td>
                                         <td className="px-6 py-4">
@@ -115,7 +97,7 @@ export default function ResourcesList() {
                                             {formatFileSize(document.resource_size)}
                                         </td>
                                         <td className="px-6 py-4">
-                                            {document.created_by}
+                                            {document.created_by.username}
                                         </td>
                                         <td className="px-6 py-4">
                                             {document.created_at}

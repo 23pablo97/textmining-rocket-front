@@ -63,10 +63,10 @@ export const logout = async (): Promise<void> => {
     }
 };
 
-export const authenticatedRequest = async (method: 'get' | 'post' | 'put' | 'delete', url: string, data: any = null): Promise<AxiosResponse<any>> => {
+export const authenticatedRequest = async (method: 'get' | 'post' | 'put' | 'delete', url: string, data: any = null, extraHeaders: any = {}): Promise<AxiosResponse<any>> => {
     try {
         let token = getAccessToken();
-        let headers = { Authorization: `Bearer ${token}` };
+        let headers = { Authorization: `Bearer ${token}`, ...extraHeaders };
 
         try {
             const response: AxiosResponse<any> = await axios({ method, url: `${API_URL}${url}`, headers, data });

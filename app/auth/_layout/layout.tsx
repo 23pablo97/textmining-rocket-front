@@ -5,13 +5,7 @@ import { initFlowbite } from 'flowbite';
 import { Navbar } from "./navbar";
 import { Sidebar } from './sidebar';
 import { UserProvider } from './userContext';
-
-interface User {
-  first_name: string;
-  last_name: string;
-  username: string;
-  email: string;
-}
+import { User } from '@/app/_utils/types/User';
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);

@@ -1,11 +1,5 @@
 import React, { createContext, useContext, ReactNode } from 'react';
-
-interface User {
-  first_name: string;
-  last_name: string;
-  username: string;
-  email: string;
-}
+import { User } from '@/app/_utils/types/User';
 
 interface UserContextProps {
   user: User | null;

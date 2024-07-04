@@ -3,13 +3,7 @@ import { useState, useEffect } from 'react';
 import { capitalizeFirstLetter, getFirstLetterCapitalized } from '@/utils/utils';
 import Cookies from 'js-cookie';
 import { useUser } from "../../_layout/userContext";
-
-interface User {
-    first_name: string;
-    last_name: string;
-    username: string;
-    email: string;
-}
+import UserProfileImage from '@/app/_utils/UserPhoto';
 
 declare global {
     interface Window {
@@ -37,9 +31,7 @@ export default function UserInfo() {
 
             <div className='ml-10'>
                 <div className="mb-5 relative inline-flex items-center justify-center w-40 h-40 overflow-hidden bg-gray-100 rounded-full dark:bg-gray-600">
-                    <span className="font-small text-5xl text-gray-600 align-left">
-                        {user && getFirstLetterCapitalized(user.first_name)}{user && getFirstLetterCapitalized(user.last_name)}
-                    </span>
+                    <UserProfileImage user={user}/>
                 </div>
                 <h2 className="text-xl font-semibold text-gray-900">
                     {user && user.username}

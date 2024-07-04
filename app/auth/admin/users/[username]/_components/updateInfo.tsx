@@ -1,12 +1,10 @@
 "use client";
 import { authenticatedRequest } from '@/utils/api';
 import { useState, useEffect, FormEvent } from 'react';
-import { useUser } from "../../../_layout/userContext";
 import Cookies from "js-cookie";
 import { getFirstLetterCapitalized } from '@/utils/utils';
 
-export default function UpdateInfo() {
-    const { user } = useUser();
+export default function UpdateInfo({user}:{user: any}) {
     const [username, setUsername] = useState('');
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
@@ -91,27 +89,14 @@ export default function UpdateInfo() {
                 <h5 className="text-xl font-bold">General information</h5>
                 <form>
                     <div className="sm:col-span-3 mb-5">
-                        <label htmlFor="username" className="block mt-5 text-sm font-medium leading-6 text-gray-900">Username: {username}</label>
-                    </div>
-                    <div className="sm:col-span-3 mb-5">
-                        <label htmlFor="photo" className="block mt-5 text-sm font-medium leading-6 text-gray-900">Photo</label>
-                        <div className="flex items-center space-x-4">
-                            <div className="relative inline-flex items-center justify-center w-20 h-20 overflow-hidden bg-gray-200 rounded-full">
-                                {preview ? (
-                                    <img className="object-cover w-full h-full" src={preview} alt="Preview" />
-                                ) : (
-                                    <span className="font-medium text-gray-600">
-                                    {user && getFirstLetterCapitalized(user.first_name)}
-                                    {user && getFirstLetterCapitalized(user.last_name)}
-                                    </span>
-                                )}
-                            </div>
-                            <input
-                            onChange={handleImageChange}
-                            className="ml-5 text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50"
-                            type="file"
-                            id="imageUpload"
-                            accept="image/*"
+                        <label htmlFor="email" className="block mt-2 text-sm font-medium leading-6 text-gray-900">Username</label>
+                        <div className="mt-2">
+                            <input 
+                                onChange={e => setUsername(e.target.value)} 
+                                value={username} 
+                                type="username" 
+                                id="username" 
+                                className="mb-5 shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" 
                             />
                         </div>
                     </div>

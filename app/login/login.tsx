@@ -10,11 +10,10 @@ export default function Login() {
     const [ message, setMessage ] = useState("");
     
     const onSubmit = async (values: any) =>{
-        console.log(values);
         try {
             const response = await login(values.username, values.password);
-            console.log(response);
             if (response){
+                console.log('alsdkjhfalhsfd');
                 setMessage("");
                 router.push('/auth/resources');
             } else {

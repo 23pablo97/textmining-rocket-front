@@ -38,9 +38,15 @@ export const Navbar = ({user}: {user: any}) => {
                                 <button type="button" className="flex text-sm bg-gray-200 rounded-full focus:ring-4 focus:ring-gray-300" aria-expanded="false" data-dropdown-toggle="dropdown-user">
                                     <span className="sr-only">Open user menu</span>
                                     <div className="relative inline-flex items-center justify-center w-8 h-8 overflow-hidden bg-gray-200 rounded-full">
-                                        <span className="font-medium text-gray-600">{(user && getFirstLetterCapitalized(user.first_name))}{(user && getFirstLetterCapitalized(user.last_name))}</span>
+                                        { user && user.image_url ? (
+                                            <img className="object-cover w-full h-full" src={user.image_url} alt="Preview" />
+                                        ) : (
+                                            <span className="font-medium text-gray-600">
+                                            {user && getFirstLetterCapitalized(user.first_name)}
+                                            {user && getFirstLetterCapitalized(user.last_name)}
+                                            </span>
+                                        )}
                                     </div>
-                                    {/* <img className="w-8 h-8 rounded-full" src="https://flowbite.com/docs/images/people/profile-picture-5.jpg" alt="user photo"/> */}
                                 </button>
                             </div>
                             <div className="z-40 hidden my-4 text-base list-none bg-white divide-y divide-gray-100 rounded shadow" id="dropdown-user">

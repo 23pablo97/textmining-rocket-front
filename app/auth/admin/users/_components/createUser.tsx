@@ -16,10 +16,10 @@ export default function CreateUser({ fetchData }: CreateUserProps) {
     const [lastName, setLastName] = useState('');
     const [email, setEmail] = useState('');
     const [role, setRole] = useState(roles[0]);
-    const [password, setPassword] = useState('');
     const [isSuccess, setIsSuccess] = useState(false);
     const [isUpload, setIsUpload] = useState(true);
     const [message, setMessage] = useState('');
+    const [usernameCheck, setUsernameCheck] = useState('');
 
     const setInitialData = () => {
         setUsername('');
@@ -27,7 +27,6 @@ export default function CreateUser({ fetchData }: CreateUserProps) {
         setLastName('');
         setEmail('');
         setRole(roles[0]);
-        setPassword('');
     };
 
     const handleRoleChange = (event: ChangeEvent<HTMLSelectElement>) => {
@@ -50,7 +49,6 @@ export default function CreateUser({ fetchData }: CreateUserProps) {
         try {
             const response = await authenticatedRequest('post', `/users/create_user`, {
                 username: username.trim(),
-                password,
                 first_name: firstName.trim(),
                 last_name: lastName.trim(),
                 email,
@@ -66,6 +64,16 @@ export default function CreateUser({ fetchData }: CreateUserProps) {
             console.error(error);
         }
         setInitialData();
+    };
+
+    const handleChangeUsername = async (event: ChangeEvent<HTMLInputElement>) => {
+        setUsername(event.target.value);
+        if (event.target.value !== '') {
+            const response = await authenticatedRequest('get', `/users/check_username?username=${event.target.value}`);
+            setUsernameCheck(response.data.message);
+        } else {
+            setUsernameCheck('');
+        }
     };
 
     return (
@@ -124,8 +132,21 @@ export default function CreateUser({ fetchData }: CreateUserProps) {
                                     <div className="sm:col-span-3">
                                         <label htmlFor="username" className="block text-sm font-medium leading-6 text-gray-900">Username</label>
                                         <div className="mt-2">
-                                            <input onChange={e => setUsername(e.target.value)} value={username} type="text" id="username" className="mb-5 shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" />
+                                            <input onChange={handleChangeUsername} value={username} type="text" id="username" className="mb-2 shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" />
                                         </div>
+                                        {usernameCheck !== '' ?
+                                            (<div className="flex mb-4 items-center text-xs text-green-800" role="alert">
+                                                <svg className="flex-shrink-0 inline w-3 h-3 me-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
+                                                </svg>
+                                                <span className="sr-only">Info</span>
+                                                <div>
+                                                    <span className="font-medium">{usernameCheck}</span>
+                                                </div>
+                                            </div>)
+                                            :
+                                            <></>
+                                        }
                                     </div>
                                 </div>
 
@@ -150,21 +171,6 @@ export default function CreateUser({ fetchData }: CreateUserProps) {
                                     <div className="mt-2">
                                         <input onChange={e => setEmail(e.target.value)} value={email} type="email" id="email" className="mb-5 shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" />
                                     </div>
-                                </div>
-
-                                <div className="relative sm:col-span-3 mb-5">
-                                    <label htmlFor="password" className="block text-sm font-medium leading-6 text-gray-900">Password</label>
-                                    <input onChange={e => setPassword(e.target.value)} value={password} id="password" type="password" className="mt-2 mb-5 shadow-sm bg-gray-50 text-gray-900 leading block border-gray-300 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none w-full p-2.5" placeholder="Enter password" />
-                                    <button type="button" data-hs-toggle-password='{"target": "#password"}' className="absolute top-9 end-0 p-2.5 rounded-e-md">
-                                        <svg className="flex-shrink-0 size-3.5 text-gray-400 dark:text-neutral-600" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                            <path className="hs-password-active:hidden" d="M9.88 9.88a3 3 0 1 0 4.24 4.24"></path>
-                                            <path className="hs-password-active:hidden" d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"></path>
-                                            <path className="hs-password-active:hidden" d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"></path>
-                                            <line className="hs-password-active:hidden" x1="2" x2="22" y1="2" y2="22"></line>
-                                            <path className="hidden hs-password-active:block" d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path>
-                                            <circle className="hidden hs-password-active:block" cx="12" cy="12" r="3"></circle>
-                                        </svg>
-                                    </button>
                                 </div>
                             </form>
                         </div>

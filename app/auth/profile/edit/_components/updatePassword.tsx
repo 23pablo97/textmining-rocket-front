@@ -26,20 +26,21 @@ export default function UpdatePassword() {
             setMessage("New Password doesn't match with validation password.");
         }
 
-        // try {
-        //     const response = await authenticatedRequest('put', `/users/${username}`, {
-        //         password: password,
-        //         new_password: newPassword,
-        //     });
-        //     setIsUpload(true);
-        //     setIsSuccess(true);
-        //     const responseUser = await authenticatedRequest('get', `/users/${username}`)
-        //     Cookies.set('user', JSON.stringify(responseUser.data));
-        //     setMessage(response.data.message || 'Password updated successfully.');
-        // } catch (error) {
-        //     setMessage('Failed to upload file.');
-        //     console.error(error);
-        // }
+        try {
+            if (user) {
+
+                const response = await authenticatedRequest('put', `/users/${user.username}`, {
+                    password: password,
+                    new_password: newPassword,
+                });
+                setIsUpload(true);
+                setIsSuccess(true);
+                setMessage(response.data.message || 'Password updated successfully.');
+            }
+        } catch (error) {
+            setMessage('Error during changing the password, please contact the admin.');
+            console.error(error);
+        }
     };
 
     return (

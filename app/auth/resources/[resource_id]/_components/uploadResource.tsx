@@ -2,13 +2,15 @@
 import React, { useState, useRef, ChangeEvent, FormEvent, useEffect } from 'react';
 import { authenticatedRequest } from '@/utils/api';
 import { capitalizeFirstLetter } from '@/utils/utils';
-import { useUser } from '../../_layout/userContext';
+import { useUser } from '../../../_layout/userContext';
+import { Document } from "@/app/_utils/types/Document";
 
 interface UploadResourceFormProps {
     fetchData: () => void;
+    latestVersion: Document;
 }
 
-const UploadResourceForm: React.FC<UploadResourceFormProps> = ({ fetchData }) => {
+const UploadResourceForm: React.FC<UploadResourceFormProps> = ({ fetchData, latestVersion }) => {
     const resourceTypes = ['corpus', 'ontology', 'other'];
     const needLanguage = ['corpus', 'ontology'];
     const languages = ['catalan', 'english', 'spanish'];
@@ -31,9 +33,9 @@ const UploadResourceForm: React.FC<UploadResourceFormProps> = ({ fetchData }) =>
     const setInitialData = () => {
         setFile(null);
         setFilename('');
-        setResourceName('');
+        setResourceName(latestVersion.resource_name);
         setDescription('');
-        setType('corpus');
+        setType(latestVersion.resource_type);
         setResourceLanguage('catalan');
         setMessage('');
         setIsSuccess(false);
@@ -45,29 +47,17 @@ const UploadResourceForm: React.FC<UploadResourceFormProps> = ({ fetchData }) =>
         }
     }
 
+    useEffect(() => {
+        if (latestVersion){
+            setInitialData();
+        }
+    }, [latestVersion]);
+
     const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
         if (event.target.files && event.target.files[0]) {
             setFile(event.target.files[0]);
             setFilename(event.target.files[0].name);
         }
-    };
-
-    const handleChangeNameOrType = async () => {
-        if (resourceName !== '') {
-            const response = await authenticatedRequest('get', `/file_storage/check_filename?resource_name=${resourceName}&resource_type=${resourceType}`);
-            setFilenameCheck(response.data.message);
-            setIsNameDuplicated(response.data.is_duplicated);
-        } else {
-            setFilenameCheck('');
-        }
-    };
-
-    useEffect(() => {
-        handleChangeNameOrType();
-    }, [resourceName, resourceType]);
-
-    const handleTypeChange = (event: ChangeEvent<HTMLSelectElement>) => {
-        setType(event.target.value);
     };
 
     const handleLanguageChange = (event: ChangeEvent<HTMLSelectElement>) => {
@@ -139,7 +129,7 @@ const UploadResourceForm: React.FC<UploadResourceFormProps> = ({ fetchData }) =>
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-4 h-4 mr-1">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 8.25H7.5a2.25 2.25 0 0 0-2.25 2.25v9a2.25 2.25 0 0 0 2.25 2.25h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25H15m0-3-3-3m0 0-3 3m3-3V15" />
                 </svg>
-                Upload resource
+                Upload new version
             </button>
             {isSuccess ? (
                 <div id="toast-top-right" className="fixed flex bg-green-400 text-white items-center w-full mt-40 max-w-xs p-4 space-x-4 text-gray-500 bg-emerald divide-x rtl:divide-x-reverse divide-gray-200 rounded-lg shadow top-5 right-4" role="alert">
@@ -159,7 +149,7 @@ const UploadResourceForm: React.FC<UploadResourceFormProps> = ({ fetchData }) =>
                     <div className="relative bg-white rounded-lg shadow">
                         <div className="flex items-center justify-between p-4 md:p-5 border-b rounded-t">
                             <h3 className="text-xl font-semibold text-gray-900">
-                                Upload resource
+                                Upload new version
                             </h3>
                             <button id="close-modal-button" type="button" className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center" data-modal-hide="upload-resource-form">
                                 <svg className="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
@@ -192,7 +182,7 @@ const UploadResourceForm: React.FC<UploadResourceFormProps> = ({ fetchData }) =>
                                                 id="type"
                                                 className="mb-5 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                                                 value={resourceType}
-                                                onChange={handleTypeChange}
+                                                disabled
                                             >
                                                 {resourceTypes.map((resourceTypeOption, index) => (
                                                     <option key={index} value={resourceTypeOption}>{capitalizeFirstLetter(resourceTypeOption)}</option>
@@ -221,7 +211,7 @@ const UploadResourceForm: React.FC<UploadResourceFormProps> = ({ fetchData }) =>
                                         <div className="sm:col-span-3">
                                             <label htmlFor="name" className="block text-sm font-medium leading-6 text-gray-900">Resource Name</label>
                                             <div className="mt-2">
-                                                <input onChange={(e) => setResourceName(e.target.value)} value={resourceName} type="text" id="name" className="mb-1 shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" />
+                                                <input disabled value={resourceName} type="text" id="name" className="mb-1 shadow-sm bg-gray-50 border border-gray-300 text-gray-r00 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" />
                                             </div>
                                             {filenameCheck !== '' ?
                                             (<div className="flex items-center text-xs text-green-800" role="alert">
@@ -244,7 +234,7 @@ const UploadResourceForm: React.FC<UploadResourceFormProps> = ({ fetchData }) =>
                                     <div className="sm:col-span-3 mb-5">
                                         <label htmlFor="name" className="block text-sm font-medium leading-6 text-gray-900">Resource Name</label>
                                         <div className="mt-2">
-                                            <input onChange={(e) => setResourceName(e.target.value)} value={resourceName} type="text" id="name" className="mb-1 shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" />
+                                            <input disabled value={resourceName} type="text" id="name" className="mb-1 shadow-sm bg-gray-50 border border-gray-300 text-gray-500 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" />
                                         </div>
                                         {filenameCheck !== '' ?
                                             (<div className="flex items-center text-xs text-green-800" role="alert">
@@ -264,8 +254,8 @@ const UploadResourceForm: React.FC<UploadResourceFormProps> = ({ fetchData }) =>
                                     <></>
                                 }
                 
-                                <label htmlFor="description" className="block mb-2 text-sm font-medium text-gray-900">Resource { !isNameDuplicated ? 'description': 'changelog' }</label>
-                                <textarea onChange={e => setDescription(e.target.value)} value={description} id="description" rows={4} className="block mb-5 p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500" placeholder="Add the resource description..."></textarea>
+                                <label htmlFor="description" className="block mb-2 text-sm font-medium text-gray-900">Resource changelog</label>
+                                <textarea onChange={e => setDescription(e.target.value)} value={description} id="description" rows={4} className="block mb-5 p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500" placeholder="Add the resource changelog..."></textarea>
 
                                 <label className="block mb-2 text-sm font-medium text-gray-900" htmlFor="resource_file">File</label>
                                 { resourceType === 'corpus' ? 

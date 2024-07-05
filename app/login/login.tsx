@@ -13,7 +13,6 @@ export default function Login() {
         try {
             const response = await login(values.username, values.password);
             if (response){
-                console.log('alsdkjhfalhsfd');
                 setMessage("");
                 router.push('/auth/resources');
             } else {

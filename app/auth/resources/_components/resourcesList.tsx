@@ -14,15 +14,19 @@ export default function ResourcesList() {
     const [totalDocuments, setTotalDocuments] = useState(0);
     const [initDocumentCurrentPage, setInitDocumentCurrentPage] = useState(1);
     const [finalDocumentCurrentPage, setFinalDocumentCurrentPage] = useState(1);
+    const [searchQuery, setSearchQuery] = useState('');
 
     const limit = 10;
 
     const fetchData = async () => {
         try {
-            const response = await authenticatedRequest(
-                'get',
-                `/file_storage/latest_versions?pagination=true&page=${currentPage}&limit=${limit}`
-            );
+            let query = `/file_storage/latest_versions?pagination=true&page=${currentPage}&limit=${limit}`;
+            
+            if (searchQuery !== ''){
+                query = `/file_storage/latest_versions?pagination=true&page=${currentPage}&limit=${limit}&resource_name=${searchQuery}`
+            }
+
+            const response = await authenticatedRequest('get', query);
             setDocuments(response.data.data);
             setTotalDocuments(response.data.metadata.total_documents);
             setTotalPages(Math.ceil(response.data.metadata.total_pages));
@@ -33,12 +37,31 @@ export default function ResourcesList() {
         }
     };
 
-    useEffect(() => {fetchData();}, [currentPage]);
+    useEffect(() => {fetchData();}, [currentPage, searchQuery]);
 
     return (
         <div>
-            <div className="flex justify-end py-4">
+            <div className="flex items-center justify-between space-x-6 mt-3 mb-3">
+                <div className="flex-grow">
+                    <div className="relative">
+                        <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                            <svg className="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                            <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
+                            </svg>
+                        </div>
+                        <input 
+                            onChange={(e) => setSearchQuery(e.target.value)} 
+                            type="search" 
+                            id="default-search" 
+                            className="block w-full p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-full bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" 
+                            placeholder="Search resources..." 
+                            required 
+                        />
+                    </div>
+                </div>
+                <div>
                     <UploadResourceForm fetchData={fetchData}/>
+                </div>
             </div>
             <div className="overflow-x-auto">
                 {totalDocuments !== 0 ? 

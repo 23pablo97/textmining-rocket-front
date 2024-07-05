@@ -1,11 +1,13 @@
 "use client";
 import { authenticatedRequest } from '@/utils/api';
-import { useState, useEffect, FormEvent } from 'react';
-import Cookies from "js-cookie";
-import { getFirstLetterCapitalized } from '@/utils/utils';
+import { useState, useEffect, FormEvent, ChangeEvent } from 'react';
+import { capitalizeFirstLetter } from '@/utils/utils';
 
 export default function UpdateInfo({user}:{user: any}) {
+    const roles = ['user', 'admin', 'external'];
+    const [role, setRole] = useState(roles[0]);
     const [username, setUsername] = useState('');
+    const [initialUsername, setInitialUsername] = useState('');
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [email, setEmail] = useState<string | undefined>('');
@@ -13,16 +15,22 @@ export default function UpdateInfo({user}:{user: any}) {
     const [isSuccess, setIsSuccess] = useState(true);
     const [message, setMessage] = useState('');
     const [selectedImage, setSelectedImage] = useState<File | null>(null);
-    const [preview, setPreview] = useState<string | null>(null);
+    const [usernameCheck, setUsernameCheck] = useState('');
 
     useEffect(() => {
         if (user) {
+            setInitialUsername(user.username)
             setUsername(user.username);
             setFirstName(user.first_name);
             setLastName(user.last_name);
             setEmail(user.email);
+            setRole(user.role);
         }
     }, [user]);
+
+    const handleRoleChange = (event: ChangeEvent<HTMLSelectElement>) => {
+        setRole(event.target.value);
+    };
 
     const handleUpdateInfo = async (e: FormEvent) => {
         e.preventDefault();
@@ -31,34 +39,16 @@ export default function UpdateInfo({user}:{user: any}) {
         setIsSuccess(false);
 
         try {
-            if (selectedImage) {
-                const reader = new FileReader();
-                reader.readAsDataURL(selectedImage);
-                reader.onloadend = async () => {
-                    const base64Image = reader.result;
-                    const response = await authenticatedRequest('put', `/users/${username}`, {
-                        username: username.trim(),
-                        first_name: firstName.trim(),
-                        last_name: lastName.trim(),
-                        email,
-                        image: base64Image
-                    });
-                    setMessage(response.data.message || 'Information updated successfully.');
-                };
-            } else {
-                const response = await authenticatedRequest('put', `/users/${username}`, {
-                    username: username.trim(),
-                    first_name: firstName.trim(),
-                    last_name: lastName.trim(),
-                    email
-                });
-                setMessage(response.data.message || 'Information updated successfully.');
-            }
+            const response = await authenticatedRequest('put', `/users/${username}`, {
+                username: username.trim(),
+                first_name: firstName.trim(),
+                last_name: lastName.trim(),
+                email,
+                role
+            });
+            setMessage(response.data.message || 'Information updated successfully.');
             setIsUpload(true);
             setIsSuccess(true);
-            const responseUser = await authenticatedRequest('get', `/users/${username}`);
-            Cookies.set('user', JSON.stringify(responseUser.data));
-            
         } catch (error) {
             setMessage('Failed to upload file.');
             setIsUpload(true);
@@ -66,38 +56,62 @@ export default function UpdateInfo({user}:{user: any}) {
         }
     };
 
-    const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0];
-        if (file) {
-            setSelectedImage(file);
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                const result = reader.result;
-                if (typeof result === 'string') {
-                    setPreview(result);
-                } else {
-                    console.error('FileReader result is not a string:', result);
-                }
-            };
-            reader.readAsDataURL(file);
+    const handleChangeUsername = async (event: ChangeEvent<HTMLInputElement>) => {
+        setUsername(event.target.value);
+        if (event.target.value === initialUsername){
+            setUsernameCheck('Same initial username');
+            return;
+        }
+        if (event.target.value !== '') {
+            const response = await authenticatedRequest('get', `/users/check_username?username=${event.target.value}`);
+            setUsernameCheck(response.data.message);
+        } else {
+            setUsernameCheck('');
         }
     };
+
+    
 
     return (
         <div>
             <div className="p-4 mt-5 border-2 border-gray-200 border-dashed rounded-lg dark:border-gray-700">
                 <h5 className="text-xl font-bold">General information</h5>
                 <form>
-                    <div className="sm:col-span-3 mb-5">
-                        <label htmlFor="email" className="block mt-2 text-sm font-medium leading-6 text-gray-900">Username</label>
-                        <div className="mt-2">
-                            <input 
-                                onChange={e => setUsername(e.target.value)} 
-                                value={username} 
-                                type="username" 
-                                id="username" 
-                                className="mb-5 shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" 
-                            />
+                <div className="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+                        <div className="sm:col-span-3">
+                            <label htmlFor="role" className="block text-sm font-medium leading-6 text-gray-900">Role</label>
+                            <div className="mt-2">
+                                <select
+                                    id="role"
+                                    className="mb-5 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                                    value={role}
+                                    onChange={handleRoleChange}
+                                >
+                                    {roles.map((roleOption, index) => (
+                                        <option key={index} value={roleOption}>{capitalizeFirstLetter(roleOption)}</option>
+                                    ))}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div className="sm:col-span-3">
+                            <label htmlFor="username" className="block text-sm font-medium leading-6 text-gray-900">Username</label>
+                            <div className="mt-2">
+                                <input onChange={handleChangeUsername} value={username} type="text" id="username" className="mb-2 shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" />
+                            </div>
+                            {usernameCheck !== '' ?
+                                (<div className="flex mb-4 items-center text-xs text-green-800" role="alert">
+                                    <svg className="flex-shrink-0 inline w-3 h-3 me-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
+                                    </svg>
+                                    <span className="sr-only">Info</span>
+                                    <div>
+                                        <span className="font-medium">{usernameCheck}</span>
+                                    </div>
+                                </div>)
+                                :
+                                <></>
+                            }
                         </div>
                     </div>
                     <div className="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">

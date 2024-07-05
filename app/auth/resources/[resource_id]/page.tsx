@@ -36,7 +36,7 @@ export default function ResourcesInfo({ params }: { params: any }) {
     return (
         <main>
             <Breadcrumb icon={ResourceIcon} breadcrumbs={breadcrumbs}/>
-            <ResourceChangelog versions={versions} currentDocumentName={currentDocumentName}/>
+            <ResourceChangelog versions={versions} currentDocumentName={currentDocumentName} fetchData={fetchData} resourceId={params.resource_id}/>
         </main>
     );
 }

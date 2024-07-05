@@ -11,5 +11,10 @@ export interface Document {
     resource_size: number;
     created_by: User;
     created_at: string;
+    save_remote?: boolean;
+    is_deleted?: boolean;
+    delete_comment?: string;
+    deleted_by?: string;
+    deleted_at?: string;
 }
 

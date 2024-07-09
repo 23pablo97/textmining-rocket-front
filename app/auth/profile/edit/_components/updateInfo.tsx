@@ -1,8 +1,10 @@
 "use client";
+import Cookies from "js-cookie";
+import Image from 'next/image';
+
 import { authenticatedRequest } from '@/utils/api';
 import { useState, useEffect, FormEvent } from 'react';
 import { useUser } from "../../../_layout/userContext";
-import Cookies from "js-cookie";
 import { getFirstLetterCapitalized } from '@/utils/utils';
 
 export default function UpdateInfo() {
@@ -98,7 +100,12 @@ export default function UpdateInfo() {
                         <div className="flex items-center space-x-4">
                             <div className="relative inline-flex items-center justify-center w-20 h-20 overflow-hidden bg-gray-200 rounded-full">
                                 {preview ? (
-                                    <img className="object-cover w-full h-full" src={preview} alt="Preview" />
+                                    <Image 
+                                        src={preview}
+                                        alt="Preview"
+                                        layout="fill"
+                                        objectFit="cover"
+                                    />
                                 ) : (
                                     <span className="font-medium text-gray-600">
                                     {user && getFirstLetterCapitalized(user.first_name)}

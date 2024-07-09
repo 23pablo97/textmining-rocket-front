@@ -1,7 +1,7 @@
 "use client";
 import Breadcrumb from "@/app/_utils/Breadcrumb";
 import { authenticatedRequest } from "@/utils/api";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import ResourceChangelog from "./_components/changelog";
 
 const ResourceIcon = (
@@ -14,19 +14,19 @@ export default function ResourcesInfo({ params }: { params: any }) {
     const [versions, setVersions] = useState([]);
     const [currentDocumentName, setCurrentDocumentName] = useState('');
 
-    const fetchData = async () => {
+    const fetchData = useCallback(async () => {
         try {
-            const response = await authenticatedRequest('get', `/file_storage/version?resource_id=${params.resource_id}`);
-            setCurrentDocumentName(response.data.data[0].resource_name);
-            setVersions(response.data.data);
+          const response = await authenticatedRequest('get', `/file_storage/version?resource_id=${params.resource_id}`);
+          setCurrentDocumentName(response.data.data[0].resource_name);
+          setVersions(response.data.data);
         } catch (error) {
-            console.error('Error fetching resource info:', error);
+          console.error('Error fetching resource info:', error);
         }
-    };
-
+    }, [params.resource_id]); // Asegúrate de incluir las dependencias necesarias
+    
     useEffect(() => {
         fetchData();
-    }, [params.resource_id]);
+    }, [fetchData, params.resource_id]);
 
     const breadcrumbs = [
         { name: 'Resources', path: '/auth/resources' },

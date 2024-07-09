@@ -1,7 +1,7 @@
 "use client";
 import Breadcrumb from "@/app/_utils/Breadcrumb";
 import { authenticatedRequest } from "@/utils/api";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import UpdateInfo from "./_components/updateInfo";
 import DangerZone from "./_components/dangerZone";
 
@@ -14,18 +14,18 @@ const UserIcon = (
 export default function UserInfo({ params }: { params: any }) {
     const [user, setUser] = useState(null);
 
-    const fetchData = async () => {
+    const fetchData = useCallback(async () => {
         try {
-            const response = await authenticatedRequest('get', `/users/${params.username}`);
-            setUser(response.data);
+          const response = await authenticatedRequest('get', `/users/${params.username}`);
+          setUser(response.data);
         } catch (error) {
-            console.error('Error fetching user info:', error);
+          console.error('Error fetching user info:', error);
         }
-    };
-
+    }, [params.username]); // Asegúrate de incluir las dependencias necesarias
+    
     useEffect(() => {
         fetchData();
-    }, [params.resource_id]);
+    }, [fetchData, params.resource_id]);
 
     const breadcrumbs = [
         { name: 'Users', path: '/auth/admin/users' },

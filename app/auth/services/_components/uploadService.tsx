@@ -4,11 +4,11 @@ import { authenticatedRequest } from '@/utils/api';
 import { capitalizeFirstLetter } from '@/utils/utils';
 import { useUser } from '../../_layout/userContext';
 
-interface UploadResourceFormProps {
+interface UploadServiceFormProps {
     fetchData: () => void;
 }
 
-const UploadResourceForm: React.FC<UploadResourceFormProps> = ({ fetchData }) => {
+const UploadServiceForm: React.FC<UploadServiceFormProps> = ({ fetchData }) => {
     const resourceTypes = ['corpus', 'ontology', 'other'];
     const needLanguage = ['corpus', 'ontology'];
     const languages = ['catalan', 'english', 'spanish'];
@@ -64,7 +64,7 @@ const UploadResourceForm: React.FC<UploadResourceFormProps> = ({ fetchData }) =>
 
     useEffect(() => {
         handleChangeNameOrType();
-    }, [handleChangeNameOrType, resourceName, resourceType]);
+    }, [resourceName, resourceType]);
 
     const handleTypeChange = (event: ChangeEvent<HTMLSelectElement>) => {
         setType(event.target.value);
@@ -135,11 +135,11 @@ const UploadResourceForm: React.FC<UploadResourceFormProps> = ({ fetchData }) =>
 
     return (
         <div>
-            <button type="button" data-modal-target="upload-resource-form" data-modal-toggle="upload-resource-form" className="flex items-center py-2 px-4 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-full border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-100 focus:ring-4 focus:ring-gray-100">
+            <button type="button" data-modal-target="upload-service-form" data-modal-toggle="upload-service-form" className="flex items-center py-2 px-4 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-full border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-100 focus:ring-4 focus:ring-gray-100">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-4 h-4 mr-1">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 8.25H7.5a2.25 2.25 0 0 0-2.25 2.25v9a2.25 2.25 0 0 0 2.25 2.25h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25H15m0-3-3-3m0 0-3 3m3-3V15" />
                 </svg>
-                Upload resource
+                Upload service
             </button>
             {isSuccess ? (
                 <div id="toast-top-right" className="fixed flex bg-green-400 text-white items-center w-full mt-40 max-w-xs p-4 space-x-4 text-gray-500 bg-emerald divide-x rtl:divide-x-reverse divide-gray-200 rounded-lg shadow top-5 right-4" role="alert">
@@ -154,14 +154,14 @@ const UploadResourceForm: React.FC<UploadResourceFormProps> = ({ fetchData }) =>
                     </div>
                 </div>
             ) : null}
-            <div id="upload-resource-form" tabIndex={-1} aria-hidden="true" className="hidden fixed inset-0 z-50 overflow-y-auto bg-gray-900 bg-opacity-75 flex justify-center items-center">
+            <div id="upload-service-form" tabIndex={-1} aria-hidden="true" className="hidden fixed inset-0 z-50 overflow-y-auto bg-gray-900 bg-opacity-75 flex justify-center items-center">
                 <div className="relative p-4 w-full max-w-2xl max-h-full">
                     <div className="relative bg-white rounded-lg shadow">
                         <div className="flex items-center justify-between p-4 md:p-5 border-b rounded-t">
                             <h3 className="text-xl font-semibold text-gray-900">
-                                Upload resource
+                                Upload service
                             </h3>
-                            <button id="close-modal-button" type="button" className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center" data-modal-hide="upload-resource-form">
+                            <button id="close-modal-button" type="button" className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center" data-modal-hide="upload-service-form">
                                 <svg className="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
                                     <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
                                 </svg>
@@ -336,4 +336,4 @@ const UploadResourceForm: React.FC<UploadResourceFormProps> = ({ fetchData }) =>
     );
 };
 
-export default UploadResourceForm;
+export default UploadServiceForm;

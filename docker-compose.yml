@@ -1,0 +1,14 @@
+services:
+  rocket-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: rocket-app
+    environment:
+      - NEXT_PUBLIC_URL_API=http://127.0.0.1:8000
+    ports:
+    - '3000:3000'
+
+networks:
+  default:
+    name: rocket

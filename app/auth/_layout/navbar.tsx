@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import { logout } from '@/utils/api';
 import { useRouter } from "next/navigation";
 import { getFirstLetterCapitalized, capitalizeFirstLetter } from '@/utils/utils';
@@ -7,7 +8,6 @@ export const Navbar = ({user}: {user: any}) => {
 
     const handleLogout = async () => {
         logout();
-        router.push('/login');
     };
 
     return (
@@ -39,8 +39,12 @@ export const Navbar = ({user}: {user: any}) => {
                                     <span className="sr-only">Open user menu</span>
                                     <div className="relative inline-flex items-center justify-center w-8 h-8 overflow-hidden bg-gray-200 rounded-full">
                                         { user && user.image_url ? (
-                                            <img className="object-cover w-full h-full" src={user.image_url} alt="Preview" />
-                                        ) : (
+                                            <Image 
+                                                src={user.image_url.replace('http://127.0.0.1:8000', 'http://rocket-api:8000')}
+                                                alt="Preview"
+                                                layout="fill"
+                                                objectFit="cover"
+                                            />                                        ) : (
                                             <span className="font-medium text-gray-600">
                                             {user && getFirstLetterCapitalized(user.first_name)}
                                             {user && getFirstLetterCapitalized(user.last_name)}

@@ -1,4 +1,6 @@
 "use client";
+import Image from 'next/image';
+
 import { useState, useEffect } from 'react';
 import { authenticatedRequest } from '@/utils/api';
 import { capitalizeFirstLetter } from '@/utils/utils';
@@ -78,7 +80,14 @@ export default function UserList() {
                 </table>
             ) : (
                 <div className="text-center">
-                    <img src="https://cdn.dribbble.com/userupload/7051469/file/original-bb6f16ce2c8ea76a86409476f8ea051f.png?resize=1200x500" className="h-full w-full object-cover object-center group-hover:opacity-75" alt="No resources available"/>
+                    <Image 
+                        src="https://cdn.dribbble.com/userupload/7051469/file/original-bb6f16ce2c8ea76a86409476f8ea051f.png?resize=1200x500"
+                        className="object-cover object-center group-hover:opacity-75"
+                        alt="No resources available"
+                        layout="responsive"
+                        width={1200}
+                        height={500}
+                    />
                     <h1 className="mt-4 text-xl font-bold tracking-tight text-gray-900">No resources available</h1>
                     <p className="mt-2 text-base leading-7 text-gray-600">Please upload a new resource</p>
                 </div>

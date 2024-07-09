@@ -65,7 +65,7 @@ export default function DeleteResource({ resourceId }: {resourceId: string}) {
                             <div className="p-4 md:p-5 space-y-2">
                                 <form>
                                     <p className="text-sm font-medium text-gray-900 truncate dark:text-white">
-                                        Please, type the word "DELETE" to delete the resource
+                                        Please, type the word &quot;DELETE&quot; to delete the resource
                                     </p>
                                     <div className="sm:col-span-3 mb-5">
                                         <div className="mt-2">

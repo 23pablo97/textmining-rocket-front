@@ -27,7 +27,7 @@ export default function ResourceChangelog({ versions, currentDocumentName, fetch
             {versions && versions.length !== 0 ? 
                 <ol className="mt-5 ml-3 relative border-s border-gray-200 dark:border-gray-700">
                     {versions.map((version) => (
-                        <li id={version._id} className="mb-10 ms-6">            
+                        <li key={version._id} id={version._id} className="mb-10 ms-6">            
                             <div className="absolute flex items-center justify-center w-6 h-6 overflow-hidden bg-blue-100 rounded-full -start-3 ring-8 ring-white">
                                 <UserProfileImage user={version.created_by}/>
                             </div>

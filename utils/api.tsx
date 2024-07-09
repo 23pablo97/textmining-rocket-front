@@ -60,6 +60,7 @@ export const logout = async (): Promise<void> => {
         Cookies.remove('access_token');
         Cookies.remove('refresh_token');
         Cookies.remove('user');
+        window.location.href = '/login';
     }
 };
 

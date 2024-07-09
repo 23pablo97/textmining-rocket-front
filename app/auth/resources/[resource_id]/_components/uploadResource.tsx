@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useRef, ChangeEvent, FormEvent, useEffect } from 'react';
+import React, { useState, useRef, ChangeEvent, FormEvent, useEffect, useCallback } from 'react';
 import { authenticatedRequest } from '@/utils/api';
 import { capitalizeFirstLetter } from '@/utils/utils';
 import { useUser } from '../../../_layout/userContext';
@@ -30,7 +30,7 @@ const UploadResourceForm: React.FC<UploadResourceFormProps> = ({ fetchData, late
     const { user } = useUser();
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    const setInitialData = () => {
+    const setInitialData = useCallback(() => {
         setFile(null);
         setFilename('');
         setResourceName(latestVersion.resource_name);
@@ -43,15 +43,15 @@ const UploadResourceForm: React.FC<UploadResourceFormProps> = ({ fetchData, late
         setIsNameDuplicated(false);
         setSaveRemote(true);
         if (fileInputRef.current) {
-            fileInputRef.current.value = '';
+          fileInputRef.current.value = '';
         }
-    }
+    }, [latestVersion]);
 
     useEffect(() => {
         if (latestVersion){
             setInitialData();
         }
-    }, [latestVersion]);
+    }, [latestVersion, setInitialData]);
 
     const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
         if (event.target.files && event.target.files[0]) {
